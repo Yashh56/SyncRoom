@@ -6,7 +6,8 @@ import React from 'react'
 
 const page = () => {
   const param = useParams()
-  const id = param.id ?? ''
+  const idParam = param.id ?? ''
+  const id = Array.isArray(idParam) ? idParam[0] : idParam
   return (
     <ChatInterface roomId={id} />
   )

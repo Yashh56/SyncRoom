@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Loader2, RefreshCw, AlertCircle, MessageCircle, BookOpen, Users, Calendar, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import AnimatedLoader from '@/components/loader'
 
 interface Chat {
   id: string
@@ -150,16 +151,7 @@ const RoomPage = () => {
   // Loading state
   if (loading && !roomDetails) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center  w-full space-y-4 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-        <div className="absolute top-20 right-8 w-32 h-32 bg-gradient-to-br from-pink-500/10 to-rose-500/10 dark:from-pink-500/20 dark:to-rose-500/20 rounded-full blur-2xl animate-pulse delay-700 pointer-events-none"></div>
-        <div className="absolute bottom-40 left-12 w-24 h-24 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 dark:from-cyan-500/20 dark:to-blue-500/20 rounded-full blur-2xl animate-pulse delay-1000 pointer-events-none"></div>
-
-        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
-        <p className="text-gray-500 text-lg">Loading room details...</p>
-        {retryCount > 0 && (
-          <p className="text-sm text-gray-400">Retry attempt {retryCount}/{maxRetries}</p>
-        )}
-      </div>
+      <AnimatedLoader />
     )
   }
 
@@ -269,10 +261,10 @@ const RoomPage = () => {
         )}
 
         {/* Materials Card */}
-        <div
-          onClick={() => toast.info("Materials section coming soon! 📚", {
-            description: "We're working on adding file sharing and resource management."
-          })}
+        <Link href={`/${id}/materials`}
+          // onClick={() => toast.info("Materials section coming soon! 📚", {
+          //   description: "We're working on adding file sharing and resource management."
+          // })}
           className="relative backdrop-blur-lg bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-white/20 dark:border-white/10 rounded-2xl h-56 p-6 flex flex-col justify-center items-center shadow-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl hover:from-green-500/30 hover:to-emerald-600/30 cursor-pointer group"
         >
           <BookOpen className="w-12 h-12 text-green-400 mb-4 group-hover:scale-110 transition-transform" />
@@ -280,10 +272,10 @@ const RoomPage = () => {
           <p className="text-sm text-white/80 text-center mb-4">
             Notes, slides & shared resources
           </p>
-          <div className="absolute bottom-3 right-4 bg-yellow-500/80 text-white text-xs px-2 py-1 rounded-full">
+          {/* <div className="absolute bottom-3 right-4 bg-yellow-500/80 text-white text-xs px-2 py-1 rounded-full">
             Coming Soon
-          </div>
-        </div>
+          </div> */}
+        </Link>
 
         {/* Members Card */}
         <Link href={`/${id}/members`} className="group">

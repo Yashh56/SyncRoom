@@ -2,6 +2,7 @@
 'use client'
 
 import Header from "@/components/header"
+import AnimatedLoader from "@/components/loader"
 import JoinedRooms from "@/components/room/joined-rooms"
 import SuggestedRooms from "@/components/room/suggested-rooms"
 import Sidebar from "@/components/Sidebar"
@@ -36,9 +37,7 @@ export default function Page() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
-        <Loader className="w-8 h-8 animate-spin text-gray-500 dark:text-gray-400" />
-      </div>
+      <AnimatedLoader />
     )
   }
   return (

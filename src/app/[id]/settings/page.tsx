@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
@@ -30,6 +31,7 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/useAuthStore'
+import AnimatedLoader from '@/components/loader'
 
 interface RoomDetails {
   id: string
@@ -325,10 +327,7 @@ const RoomSettingsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 w-full space-y-4">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
-        <p className="text-gray-500 text-lg">Loading room settings...</p>
-      </div>
+      <AnimatedLoader />
     )
   }
 
@@ -559,7 +558,6 @@ const RoomSettingsPage = () => {
               </div>
               <button
                 onClick={() => setMode(!mode)}
-                value={mode}
                 // onClick={() => handleInputChange('isPrivate', !formData.isPrivate)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.isPrivate ? 'bg-blue-600' : 'bg-gray-600'
                   }`}
@@ -667,7 +665,7 @@ const RoomSettingsPage = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="text-sm font-medium text-red-400 block mb-2">
-                        Type "{roomDetails.name}" to confirm deletion:
+                        Type "{roomDetails.name}&#34; to confirm deletion:
                       </label>
                       <input
                         type="text"

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     Upload,
     FolderPlus,
@@ -19,9 +19,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import axios from 'axios';
+import { useEdgeStore } from '@/lib/edgeStore';
 
 const MaterialsPage = () => {
-    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('name');
     const [currentFolder, setCurrentFolder] = useState('');
@@ -29,127 +31,198 @@ const MaterialsPage = () => {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
     const roomId = useParams().id;
-    // Sample data
-    const materials = [
-        {
-            id: 1,
-            name: 'Presentations',
-            type: 'folder',
-            items: 8,
-            updatedBy: 'Sarah Chen',
-            updatedAt: '2 hours ago',
-            size: null
-        },
-        {
-            id: 2,
-            name: 'Images',
-            type: 'folder',
-            items: 15,
-            updatedBy: 'Mike Johnson',
-            updatedAt: 'yesterday',
-            size: null
-        },
-        {
-            id: 3,
-            name: 'Project Proposal.pdf',
-            type: 'pdf',
-            updatedAt: '3 hours ago',
-            size: '2.4 MB'
-        },
-        {
-            id: 4,
-            name: 'Meeting Notes.docx',
-            type: 'document',
-            updatedAt: '1 day ago',
-            size: '845 KB'
-        },
-        {
-            id: 5,
-            name: 'Design Mockup.jpg',
-            type: 'image',
-            updatedAt: '2 days ago',
-            size: '1.8 MB'
-        },
-        {
-            id: 6,
-            name: 'Demo Video.mp4',
-            type: 'video',
-            updatedAt: '3 days ago',
-            size: '15.2 MB'
+    type Material = {
+        id: string;
+        title: string;
+        description?: string;
+        attachmentUrl: string;
+        createdAt: string;
+        // add other properties as needed
+    };
+    const [materials, setMaterials] = useState<Material[]>([]);
+    const [file, setFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        const getMaterials = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/materials/${roomId}`, {
+                    withCredentials: true
+                });
+                console.log(res.data)
+                setMaterials(res.data.data)
+            } catch (error) {
+                console.log(error)
+            }
         }
-    ];
+        getMaterials();
+    }, []);
 
-    const recentFiles = [
-        { id: 1, name: 'Project Proposal.pdf', type: 'pdf', accessedAt: '2 minutes ago' },
-        { id: 2, name: 'Meeting Notes.docx', type: 'document', accessedAt: '1 hour ago' },
-        { id: 3, name: 'Design Mockup.jpg', type: 'image', accessedAt: '3 hours ago' }
-    ];
+    const { edgestore } = useEdgeStore();
 
-    const getFileIcon = (type) => {
+    const insertMaterial = async (fileToUpload: File) => {
+        try {
+            setIsUploading(true);
+            let uploadAttachmentUrl = '';
+
+            if (fileToUpload) {
+                const uploadResult = await edgestore.publicFiles.upload({
+                    file: fileToUpload,
+                    onProgressChange: (progress) => {
+                        console.log('Upload progress:', progress);
+                        setUploadProgress(progress);
+                    },
+                });
+                uploadAttachmentUrl = uploadResult.url;
+            }
+
+            const res = await axios.post(`http://localhost:5000/materials/${roomId}`, {
+                title: fileToUpload?.name || 'New Material',
+                description: 'This is a new material',
+                attachmentUrl: uploadAttachmentUrl,
+            }, {
+                withCredentials: true
+            });
+
+            console.log(res.data);
+
+            // Refresh materials list
+            const updatedMaterials = await axios.get(`http://localhost:5000/materials/${roomId}`, {
+                withCredentials: true
+            });
+            setMaterials(updatedMaterials.data.data);
+
+            // Close modal and reset states
+            setTimeout(() => {
+                setShowUploadModal(false);
+                setSelectedFiles([]);
+                setFile(null);
+                setIsUploading(false);
+                setUploadProgress(0);
+            }, 500);
+
+        } catch (error) {
+            console.log(error);
+            setIsUploading(false);
+        }
+    };
+
+    // Function to determine file type from URL or filename
+    const getFileType = (filename: string, attachmentUrl: string) => {
+        const extension = filename.split('.').pop()?.toLowerCase() || '';
+        const url = attachmentUrl?.toLowerCase() || '';
+
+        if (['pdf'].includes(extension) || url.includes('.pdf')) return 'pdf';
+        if (['doc', 'docx', 'txt', 'rtf'].includes(extension) || url.includes('.doc')) return 'document';
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension) ||
+            url.includes('.jpg') || url.includes('.jpeg') || url.includes('.png') || url.includes('.gif')) return 'image';
+        if (['mp4', 'avi', 'mov', 'wmv', 'mkv', 'webm'].includes(extension) ||
+            url.includes('.mp4') || url.includes('.mov')) return 'video';
+        if (['mp3', 'wav', 'ogg', 'flac'].includes(extension)) return 'audio';
+        return 'file';
+    };
+
+    const getFileIcon = (type: string) => {
         const iconMap = {
             folder: <Folder className="w-6 h-6" />,
             pdf: <FileText className="w-6 h-6" />,
             document: <FileText className="w-6 h-6" />,
             image: <Image className="w-6 h-6" />,
             video: <Video className="w-6 h-6" />,
+            audio: <Video className="w-6 h-6" />,
+            file: <File className="w-6 h-6" />,
             default: <File className="w-6 h-6" />
         };
-        return iconMap[type] || iconMap.default;
+        return iconMap[type as keyof typeof iconMap] || iconMap.default;
     };
 
-    const getIconBg = (type) => {
+    const getIconBg = (type: string) => {
         const bgMap = {
             folder: 'bg-gradient-to-br from-purple-500 to-purple-600',
-            pdf: 'bg-gradient-to-br from-blue-500 to-blue-600',
+            pdf: 'bg-gradient-to-br from-red-500 to-red-600',
             document: 'bg-gradient-to-br from-blue-500 to-blue-600',
             image: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
             video: 'bg-gradient-to-br from-amber-500 to-amber-600',
+            audio: 'bg-gradient-to-br from-purple-500 to-purple-600',
+            file: 'bg-gradient-to-br from-gray-500 to-gray-600',
             default: 'bg-gradient-to-br from-gray-500 to-gray-600'
         };
-        return bgMap[type] || bgMap.default;
+        return bgMap[type as keyof typeof bgMap] || bgMap.default;
     };
 
-    const handleFileUpload = useCallback((files) => {
-        setSelectedFiles(Array.from(files));
+    // Function to format date
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: 'long',  // 'short' for "May", 'long' for "May"
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,   // Set to false for 24-hour format
+        };
+
+        return date.toLocaleString('en-US', options);
+    };
+
+    // Function to get file size (placeholder - you might want to fetch this from your backend)
+    const getFileSize = (url: string) => {
+        // This is a placeholder. In a real app, you'd want to store file size in your database
+        // or fetch it from the file URL
+        return 'Unknown size';
+    };
+
+    const handleFileUpload = useCallback((files: FileList | null) => {
+        if (files && files.length > 0) {
+            const fileArray = Array.from(files);
+            setSelectedFiles(fileArray);
+            setFile(fileArray[0]); // Set the first file as the main file
+
+            // Automatically call insertMaterial when file is selected
+            if (fileArray[0]) {
+                insertMaterial(fileArray[0]);
+            }
+        }
     }, []);
 
-    const handleDragOver = useCallback((e) => {
+    const handleDragOver = useCallback((e: { preventDefault: () => void; }) => {
         e.preventDefault();
     }, []);
 
-    const handleDrop = useCallback((e) => {
+    const handleDrop = useCallback((e: { preventDefault: () => void; dataTransfer: { files: FileList; }; }) => {
         e.preventDefault();
         const files = e.dataTransfer.files;
         handleFileUpload(files);
     }, [handleFileUpload]);
 
     const startUpload = () => {
-        if (selectedFiles.length === 0) return;
-
-        setIsUploading(true);
-        setUploadProgress(0);
-
-        const interval = setInterval(() => {
-            setUploadProgress(prev => {
-                const newProgress = prev + Math.random() * 20;
-                if (newProgress >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        setShowUploadModal(false);
-                        setSelectedFiles([]);
-                        setIsUploading(false);
-                        setUploadProgress(0);
-                    }, 500);
-                    return 100;
-                }
-                return newProgress;
-            });
-        }, 200);
+        if (selectedFiles.length === 0 || !file) return;
+        insertMaterial(file);
     };
 
     const filteredMaterials = materials.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+        item.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const deleteMaterial = async (id: string, attachmentUrl: string) => {
+        try {
+            const res = await axios.delete(`http://localhost:5000/materials/${id}`, { withCredentials: true })
+            console.log(res.data)
+            // Refresh materials list after deletion
+            if (res.data.status === 'success') {
+                await edgestore.publicFiles.delete({
+                    url: attachmentUrl
+                })
+
+                const updatedMaterials = await axios.get(`http://localhost:5000/materials/${roomId}`, {
+                    withCredentials: true
+                });
+                setMaterials(updatedMaterials.data.data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100">
@@ -227,7 +300,7 @@ const MaterialsPage = () => {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
-                        <div className="text-3xl font-bold text-emerald-400 mb-2">24</div>
+                        <div className="text-3xl font-bold text-emerald-400 mb-2">{materials.length}</div>
                         <div className="text-gray-400 text-sm">Total Files</div>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
@@ -246,74 +319,109 @@ const MaterialsPage = () => {
 
                 {/* Materials Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-                    {filteredMaterials.map((item) => (
-                        <div
-                            key={item.id}
-                            className="group bg-white/5 border border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-white/10 hover:border-emerald-500/30 hover:transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
-                        >
-                            {/* Gradient overlay on hover */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    {filteredMaterials.map((item, index) => {
+                        const fileType = getFileType(item.title, item.attachmentUrl);
+                        return (
+                            <div
+                                key={item.id}
+                                className="group bg-white/5 border border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-white/10 hover:border-emerald-500/30 hover:transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+                            >
+                                {/* Gradient overlay on hover */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                            <div className="relative z-10">
-                                <div className={`w-12 h-12 rounded-xl ${getIconBg(item.type)} flex items-center justify-center text-white mb-4`}>
-                                    {getFileIcon(item.type)}
-                                </div>
+                                <div className="relative z-10">
+                                    <div className={`w-12 h-12 rounded-xl ${getIconBg(fileType)} flex items-center justify-center text-white mb-4`}>
+                                        {getFileIcon(fileType)}
+                                    </div>
 
-                                <h3 className="font-semibold text-lg mb-2 text-gray-100 truncate">{item.name}</h3>
+                                    <h3 className="font-semibold text-lg mb-2 text-gray-100 truncate" title={item.title}>
+                                        {item.title}
+                                    </h3>
 
-                                <div className="text-sm text-gray-400 mb-1">
-                                    {item.type === 'folder'
-                                        ? `${item.items} files • Updated ${item.updatedAt}`
-                                        : `${item.type.toUpperCase()} • Added ${item.updatedAt}`
-                                    }
-                                </div>
+                                    <div className="text-sm text-gray-400 mb-1">
+                                        {fileType.toUpperCase()} • Uploaded {formatDate(item.createdAt)}
+                                    </div>
 
-                                <div className="text-xs text-gray-500">
-                                    {item.type === 'folder' ? `By ${item.updatedBy}` : item.size}
-                                </div>
+                                    <div className="text-xs text-gray-500 truncate">
+                                        {item.description}
+                                    </div>
 
-                                {/* Action buttons */}
-                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <div className="flex items-center space-x-1">
-                                        <button className="p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
-                                            <Download className="w-4 h-4" />
-                                        </button>
-                                        <button className="p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
-                                            <Share2 className="w-4 h-4" />
-                                        </button>
-                                        <button className="p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors text-red-400">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                    {/* File size and download link */}
+                                    <div className="text-xs text-gray-500 mt-2">
+                                        Size: {getFileSize(item.attachmentUrl)}
+                                    </div>
+
+                                    {/* Action buttons */}
+                                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <div className="flex items-center space-x-1">
+                                            <a
+                                                href={item.attachmentUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"
+                                                title="Download/View"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </a>
+                                            <button
+                                                className="p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"
+                                                title="Share"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigator.clipboard.writeText(item.attachmentUrl);
+                                                    // You could add a toast notification here
+                                                }}
+                                            >
+                                                <Share2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                className="p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors text-red-400"
+                                                title="Delete"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm(`Are you sure you want to delete "${item.title}"?`))
+                                                        deleteMaterial(item.id, item.attachmentUrl);
+                                                }}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
 
-                {/* Recent Files */}
-                <div className="mb-8">
-                    <h2 className="text-xl font-semibold mb-6 text-gray-100">Recently Accessed</h2>
-                    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm">
-                        {recentFiles.map((file, index) => (
-                            <div
-                                key={file.id}
-                                className={`flex items-center p-6 hover:bg-white/5 cursor-pointer transition-colors ${index !== recentFiles.length - 1 ? 'border-b border-white/5' : ''
-                                    }`}
-                            >
-                                <div className={`w-8 h-8 rounded-lg ${getIconBg(file.type)} flex items-center justify-center text-white mr-4`}>
-                                    {getFileIcon(file.type)}
-                                </div>
-                                <div className="flex-1">
-                                    <div className="font-medium text-gray-100">{file.name}</div>
-                                    <div className="text-sm text-gray-400">Opened {file.accessedAt}</div>
-                                </div>
-                                <button className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                                    <MoreVertical className="w-4 h-4 text-gray-400" />
-                                </button>
+                                {/* Click to preview/open */}
+                                <div
+                                    className="absolute inset-0 cursor-pointer"
+                                    onClick={() => {
+                                        // Open file in new tab
+                                        window.open(item.attachmentUrl, '_blank');
+                                    }}
+                                />
                             </div>
-                        ))}
-                    </div>
+                        );
+                    })}
+
+                    {/* Empty state */}
+                    {filteredMaterials.length === 0 && (
+                        <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-400">
+                            <div className="text-6xl mb-4">📁</div>
+                            <h3 className="text-xl font-semibold mb-2">No materials found</h3>
+                            <p className="text-center">
+                                {searchQuery ?
+                                    `No materials match "${searchQuery}". Try a different search term.` :
+                                    'Upload your first file to get started!'
+                                }
+                            </p>
+                            {!searchQuery && (
+                                <button
+                                    onClick={() => setShowUploadModal(true)}
+                                    className="mt-4 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300"
+                                >
+                                    Upload Files
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -327,7 +435,10 @@ const MaterialsPage = () => {
                             className="border-2 border-dashed border-emerald-500/30 rounded-2xl p-12 text-center cursor-pointer hover:border-emerald-500/60 hover:bg-emerald-500/5 transition-all duration-300"
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
-                            onClick={() => document.getElementById('fileInput').click()}
+                            onClick={() => {
+                                const input = document.getElementById('fileInput');
+                                if (input) input.click();
+                            }}
                         >
                             <div className="text-6xl mb-4">📤</div>
                             {selectedFiles.length > 0 ? (
@@ -369,7 +480,11 @@ const MaterialsPage = () => {
 
                         <div className="flex items-center space-x-4 mt-8">
                             <button
-                                onClick={() => setShowUploadModal(false)}
+                                onClick={() => {
+                                    setShowUploadModal(false);
+                                    setSelectedFiles([]);
+                                    setFile(null);
+                                }}
                                 className="flex-1 px-6 py-3 bg-white/10 text-gray-300 rounded-xl hover:bg-white/20 transition-colors"
                                 disabled={isUploading}
                             >

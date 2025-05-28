@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/useAuthStore'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import AnimatedLoader from '@/components/loader'
 
 interface Member {
     id: string
@@ -97,9 +98,7 @@ const MembersPage = () => {
             }
         } catch (error) {
             console.error('Failed to fetch room details:', error)
-            const errorMessage = error.response?.data?.message ||
-                error.message ||
-                'Failed to load room details'
+            const errorMessage = 'Failed to load room details'
             setError(errorMessage)
         } finally {
             setLoading(false)
@@ -149,7 +148,11 @@ const MembersPage = () => {
                 throw new Error(res.data.message || 'Failed to update member role')
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update member role')
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.message || 'Failed to update member role')
+            } else {
+                toast.error('Failed to update member role')
+            }
         } finally {
             setActionLoading(null)
         }
@@ -183,7 +186,7 @@ const MembersPage = () => {
                     throw new Error(res.data.message || 'Failed to remove member')
                 }
             } catch (error) {
-                toast.error(error.response?.data?.message || 'Failed to remove member')
+                toast.error('Failed to remove member')
             } finally {
                 setActionLoading(null)
             }
@@ -225,10 +228,7 @@ const MembersPage = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center h-[60vh] w-full space-y-4">
-                <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
-                <p className="text-gray-500 text-lg">Loading members...</p>
-            </div>
+            <AnimatedLoader />
         )
     }
 
@@ -258,7 +258,14 @@ const MembersPage = () => {
     }
 
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-violet-500/5 dark:bg-violet-500/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/3 dark:bg-purple-500/8 rounded-full blur-3xl animate-pulse delay-500"></div>
+            </div>
+
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -485,6 +492,9 @@ const MembersPage = () => {
                         })}
                     </>
                 )}
+                <div className="absolute top-20 right-8 w-32 h-32 bg-gradient-to-br from-pink-500/10 to-rose-500/10 dark:from-pink-500/20 dark:to-rose-500/20 rounded-full blur-2xl animate-pulse delay-700 pointer-events-none"></div>
+                <div className="absolute bottom-40 left-12 w-24 h-24 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 dark:from-cyan-500/20 dark:to-blue-500/20 rounded-full blur-2xl animate-pulse delay-1000 pointer-events-none"></div>
+
             </div>
         </div>
     )
