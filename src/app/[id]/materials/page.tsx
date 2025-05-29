@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useEdgeStore } from '@/lib/edgeStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const MaterialsPage = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -30,7 +31,15 @@ const MaterialsPage = () => {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
+    type Member = {
+        id: string;
+        user: { id: string };
+        role: string;
+        // add other properties if needed
+    };
+    const [members, setMembers] = useState<Member[]>([]);
     const roomId = useParams().id;
+    const user = useAuthStore((state) => state.user);
     type Material = {
         id: string;
         title: string;
@@ -54,6 +63,21 @@ const MaterialsPage = () => {
                 console.log(error)
             }
         }
+
+        const getRoomDetails = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/room/details/${roomId}`, {
+                    withCredentials: true
+                });
+                console.log(res.data.data.members);
+                setMembers(res.data.data.members);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+
+        getRoomDetails();
         getMaterials();
     }, []);
 
@@ -249,17 +273,26 @@ const MaterialsPage = () => {
                 {/* Action Bar */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
                     <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => setShowUploadModal(true)}
-                            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-300 shadow-lg shadow-emerald-500/25"
-                        >
-                            <Upload className="w-5 h-5" />
-                            <span>Upload Files</span>
-                        </button>
-                        <button className="flex items-center space-x-2 px-6 py-3 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-xl hover:bg-purple-500/20 transition-all duration-300">
+                        {
+                            members.map((m) =>
+                                m.user.id === user?.id && m.role === 'ADMIN' ? (
+                                    <button
+                                        key={m.id}
+                                        onClick={() => setShowUploadModal(true)}
+                                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-300 shadow-lg shadow-emerald-500/25"
+                                    >
+                                        <Upload className="w-5 h-5" />
+                                        <span>Upload Files</span>
+                                    </button>
+                                ) : null
+                            )
+                        }
+
+
+                        {/* <button className="flex items-center space-x-2 px-6 py-3 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-xl hover:bg-purple-500/20 transition-all duration-300">
                             <FolderPlus className="w-5 h-5" />
                             <span>New Folder</span>
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className="flex items-center space-x-4">
@@ -303,7 +336,7 @@ const MaterialsPage = () => {
                         <div className="text-3xl font-bold text-emerald-400 mb-2">{materials.length}</div>
                         <div className="text-gray-400 text-sm">Total Files</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
+                    {/* <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
                         <div className="text-3xl font-bold text-purple-400 mb-2">6</div>
                         <div className="text-gray-400 text-sm">Folders</div>
                     </div>
@@ -314,7 +347,7 @@ const MaterialsPage = () => {
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
                         <div className="text-3xl font-bold text-amber-400 mb-2">12</div>
                         <div className="text-gray-400 text-sm">Shared Items</div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Materials Grid */}
