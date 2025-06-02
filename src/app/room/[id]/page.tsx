@@ -73,7 +73,7 @@ const RoomPage = () => {
       if (res.data.status === 'success' && res.data.data) {
         setRoomDetails(res.data.data)
         setRetryCount(0)
-
+        document.title = `${res.data.data.name}`
         if (showToast) {
           toast.success('Room details refreshed!', { id: 'refresh-room' })
         }
