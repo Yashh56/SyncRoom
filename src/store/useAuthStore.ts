@@ -1,3 +1,4 @@
+import { localURL } from "@/lib/url";
 import axios from "axios";
 import { toast } from "sonner";
 import { create } from "zustand";
@@ -39,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
 
         try {
-          const res = await axios.get("http://localhost:5000/auth/status", {
+          const res = await axios.get(`${localURL}/auth/status`, {
             withCredentials: true,
           });
 

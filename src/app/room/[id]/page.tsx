@@ -7,10 +7,11 @@ import { useParams, useRouter } from 'next/navigation'
 import React, { useState, useEffect, useCallback } from 'react'
 import RoomHeader from '@/components/room/room-header'
 import Link from 'next/link'
-import { Loader2, RefreshCw, AlertCircle, MessageCircle, BookOpen, Users, Calendar, Settings } from 'lucide-react'
+import { Loader2, RefreshCw, AlertCircle, MessageCircle, BookOpen, Users, Calendar, Settings, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import AnimatedLoader from '@/components/loader'
+import { localURL } from '@/lib/url'
 
 interface Chat {
   id: string
@@ -52,7 +53,7 @@ const RoomPage = () => {
   const [retryCount, setRetryCount] = useState(0)
 
   const maxRetries = 3
-  const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+  const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || localURL
 
   const getRoomDetails = useCallback(async (showToast = false) => {
     if (!id) return
@@ -144,6 +145,10 @@ const RoomPage = () => {
     getRoomDetails(true)
   }
 
+  const handleBack = () => {
+    router.back()
+  }
+
   useEffect(() => {
     getRoomDetails()
   }, [getRoomDetails])
@@ -213,6 +218,15 @@ const RoomPage = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/3 dark:bg-purple-500/8 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
+
+      {/* Back Button */}
+      <button
+        onClick={handleBack}
+        className="flex items-center gap-2 mb-4 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group"
+      >
+        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+        <span className="text-sm font-medium">Back</span>
+      </button>
 
       {/* Room Header */}
       <div className="flex items-center justify-between">

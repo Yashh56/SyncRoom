@@ -32,6 +32,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/useAuthStore'
 import AnimatedLoader from '@/components/loader'
+import { localURL } from '@/lib/url'
 
 interface RoomDetails {
   id: string
@@ -85,7 +86,7 @@ const RoomSettingsPage = () => {
   const [mode, setMode] = useState(false)
 
 
-  const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+  const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || localURL
 
   // Check permissions
   const currentUserMembership = roomDetails?.members.find(m => m.userId === currentUser?.id)

@@ -28,6 +28,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import AnimatedLoader from '@/components/loader'
+import { localURL } from '@/lib/url'
 
 interface Member {
     id: string
@@ -75,7 +76,7 @@ const MembersPage = () => {
     const [roleFilter, setRoleFilter] = useState<RoleFilter>('ALL')
     const [selectedMember, setSelectedMember] = useState<string | null>(null)
 
-    const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || localURL
 
     // Get room details including members
     const getRoomDetails = useCallback(async () => {
@@ -196,7 +197,7 @@ const MembersPage = () => {
     // Copy invite code
     const copyInviteCode = () => {
         if (roomDetails?.inviteCode) {
-            navigator.clipboard.writeText(roomDetails.inviteCode)
+            navigator.clipboard.writeText(`http://localhost:3000/room/invite/${roomDetails.inviteCode}`)
             toast.success('Invite code copied to clipboard!')
         }
     }
@@ -407,7 +408,8 @@ const MembersPage = () => {
                                                             {/* Avatar */}
                                                             <div className="relative">
                                                                 <Avatar>
-                                                                    <AvatarImage src={member.user.image} alt={member.user.name} />
+                                                                    <AvatarImage src={member.user.image} referrerPolicy="no-referrer"
+                                                                        alt={member.user.name} />
                                                                     <AvatarFallback>
                                                                         {member.user.name?.[0] /* or initials like: member.user.name?.slice(0, 2) */}
                                                                     </AvatarFallback>

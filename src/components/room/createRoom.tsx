@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useEdgeStore } from '@/lib/edgeStore'
+import { localURL } from '@/lib/url'
 
 const CreateRoom = () => {
     const [open, setOpen] = React.useState(false)
@@ -65,7 +66,7 @@ const CreateRoom = () => {
             }
 
             const response = await axios.post(
-                'http://localhost:5000/room/create',
+                `${localURL}/room/create`,
                 {
                     name,
                     banner: uploadedBannerUrl,

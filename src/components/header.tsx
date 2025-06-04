@@ -48,7 +48,7 @@ const Header = () => {
             <DropdownMenuLabel className="text-gray-900 dark:text-gray-50">Room Actions</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-800" />
             <DropdownMenuGroup>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-gray-700 dark:text-gray-300 focus:bg-gray-100 dark:focus:bg-gray-800"
                 onSelect={() => {
                   const createRoomButton = document.getElementById("create-room-button");
@@ -57,7 +57,7 @@ const Header = () => {
               >
                 Create Room
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-gray-700 dark:text-gray-300 focus:bg-gray-100 dark:focus:bg-gray-800"
                 onSelect={() => {
                   const joinRoomButton = document.getElementById("join-room-button");
@@ -109,6 +109,7 @@ const Header = () => {
             <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
               <Avatar className="h-9 w-9 border border-gray-200 dark:border-gray-800">
                 <AvatarImage
+                  referrerPolicy="no-referrer"
                   src={user?.image || ""}
                   alt={user?.name || "User profile"}
                 />
@@ -134,7 +135,7 @@ const Header = () => {
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="text-gray-700 dark:text-gray-300 focus:bg-gray-100 dark:focus:bg-gray-800"
               onClick={logout}
             >

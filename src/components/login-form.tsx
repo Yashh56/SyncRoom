@@ -2,13 +2,14 @@
 "use client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { localURL } from "@/lib/url"
 export function LoginForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"form">) {
 
     const handleGoogleLogin = () => {
-        window.open('http://localhost:5000/auth/google', "_self")
+        window.open(`${localURL}/auth/google`, "_self")
     }
 
     return (

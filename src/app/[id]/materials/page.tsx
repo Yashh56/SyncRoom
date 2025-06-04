@@ -22,6 +22,7 @@ import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useEdgeStore } from '@/lib/edgeStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { localURL } from '@/lib/url';
 
 const MaterialsPage = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -54,7 +55,7 @@ const MaterialsPage = () => {
     useEffect(() => {
         const getMaterials = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/materials/${roomId}`, {
+                const res = await axios.get(`${localURL}/materials/${roomId}`, {
                     withCredentials: true
                 });
                 console.log(res.data)
@@ -66,7 +67,7 @@ const MaterialsPage = () => {
 
         const getRoomDetails = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/room/details/${roomId}`, {
+                const res = await axios.get(`${localURL}/room/details/${roomId}`, {
                     withCredentials: true
                 });
                 console.log(res.data.data.members);
@@ -99,7 +100,7 @@ const MaterialsPage = () => {
                 uploadAttachmentUrl = uploadResult.url;
             }
 
-            const res = await axios.post(`http://localhost:5000/materials/${roomId}`, {
+            const res = await axios.post(`${localURL}/materials/${roomId}`, {
                 title: fileToUpload?.name || 'New Material',
                 description: 'This is a new material',
                 attachmentUrl: uploadAttachmentUrl,
@@ -110,7 +111,7 @@ const MaterialsPage = () => {
             console.log(res.data);
 
             // Refresh materials list
-            const updatedMaterials = await axios.get(`http://localhost:5000/materials/${roomId}`, {
+            const updatedMaterials = await axios.get(`${localURL}/materials/${roomId}`, {
                 withCredentials: true
             });
             setMaterials(updatedMaterials.data.data);
@@ -230,7 +231,7 @@ const MaterialsPage = () => {
 
     const deleteMaterial = async (id: string, attachmentUrl: string) => {
         try {
-            const res = await axios.delete(`http://localhost:5000/materials/${id}`, { withCredentials: true })
+            const res = await axios.delete(`${localURL}/materials/${id}`, { withCredentials: true })
             console.log(res.data)
             // Refresh materials list after deletion
             if (res.data.status === 'success') {
@@ -238,7 +239,7 @@ const MaterialsPage = () => {
                     url: attachmentUrl
                 })
 
-                const updatedMaterials = await axios.get(`http://localhost:5000/materials/${roomId}`, {
+                const updatedMaterials = await axios.get(`${localURL}/materials/${roomId}`, {
                     withCredentials: true
                 });
                 setMaterials(updatedMaterials.data.data);

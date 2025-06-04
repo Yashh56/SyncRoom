@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRoomStore } from '@/store/useRoomStore'
 import { motion } from 'framer-motion'
 import { Users, MessageCircle, Crown, Sparkles } from 'lucide-react'
+import { localURL } from '@/lib/url'
 
 const JoinedRooms = () => {
   interface Room {
@@ -25,7 +26,7 @@ const JoinedRooms = () => {
   const roomsFromDB = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('http://localhost:5000/room/joined', {
+      const res = await axios.get(`${localURL}/room/joined`, {
         withCredentials: true,
       })
       if (res.data.status === 'success') {

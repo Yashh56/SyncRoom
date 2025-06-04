@@ -12,6 +12,7 @@ import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import AnimatedLoader from '@/components/loader';
+import { localURL } from '@/lib/url';
 
 const RoomInvitePage = () => {
   const params = useParams();
@@ -59,7 +60,7 @@ const RoomInvitePage = () => {
     const getRoomInfo = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(`http://localhost:5000/room/invite/${inviteCode}`, { withCredentials: true });
+        const res = await axios.get(`${localURL}/room/invite/${inviteCode}`, { withCredentials: true });
         console.log(res.data)
         const data = res.data.data;
 
@@ -81,7 +82,7 @@ const RoomInvitePage = () => {
       setIsJoining(true);
       setJoinStatus(null);
 
-      const res = await axios.post(`http://localhost:5000/room/join`, {
+      const res = await axios.post(`${localURL}/room/join`, {
         inviteCode: inviteCode
       }, { withCredentials: true });
 

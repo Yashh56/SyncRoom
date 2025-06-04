@@ -6,6 +6,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Users } from 'lucide-react'
+import { localURL } from '@/lib/url'
 
 const JoinRoom = () => {
   const [value, setValue] = React.useState("")
@@ -14,7 +15,7 @@ const JoinRoom = () => {
   const Join = async () => {
     setLoading(true)
     try {
-      const res = await axios.post('http://localhost:5000/room/join', {
+      const res = await axios.post(`${localURL}/room/join`, {
         inviteCode: value,
       }, { withCredentials: true })
       if (res.data.status === 'success') {

@@ -7,6 +7,7 @@ import { Badge } from "../ui/badge";
 import { Users, Globe, Lock, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { localURL } from '@/lib/url';
 
 const SuggestedRooms = () => {
     interface Room {
@@ -28,7 +29,7 @@ const SuggestedRooms = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await axios.get('http://localhost:5000/room/public', { withCredentials: true });
+                const res = await axios.get(`${localURL}/room/public`, { withCredentials: true });
                 console.log(res.data.data);
                 setRooms(res.data.data);
             } catch (error) {
@@ -44,7 +45,7 @@ const SuggestedRooms = () => {
     const handleJoinRoom = async (inviteCode: string) => {
         try {
             setLoading(true);
-            const res = await axios.post('http://localhost:5000/room/join', {
+            const res = await axios.post(`${localURL}/room/join`, {
                 inviteCode,
             }, { withCredentials: true });
 
