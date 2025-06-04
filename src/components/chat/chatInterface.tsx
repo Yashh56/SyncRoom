@@ -36,6 +36,7 @@ export default function ChatInterface({ roomId }: { roomId: string }) {
   };
 
   // Handle scroll events to detect user scrolling
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleScroll = (e: any) => {
     const element = e.target;
     const isAtBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 100;

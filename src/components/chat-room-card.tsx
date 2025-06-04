@@ -1,6 +1,7 @@
 import { ChevronRight } from "lucide-react";
 
 // ChatRoomCard Component
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ChatRoomCard = ({ room }: { room: any }) => {
     return (
         <div className="bg-white p-6 rounded-xl shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">

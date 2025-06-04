@@ -9,11 +9,14 @@ interface Message {
 }
 
 // Define member interface
-interface Member {
+export interface Member {
   id: string;
-  name: string;
-  image?: string;
-  role?: string; // Optional role property
+  user: {
+    id: string;
+    name: string;
+    image: string | null;
+  };
+  role: string;
 }
 
 // Define RoomState interface

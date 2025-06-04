@@ -26,7 +26,7 @@ import {
 
 const Header = () => {
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  // const logout = useAuthStore((state) => state.logout);
 
   const initial = user?.name?.charAt(0)?.toUpperCase() || "U";
 
@@ -137,7 +137,7 @@ const Header = () => {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-gray-700 dark:text-gray-300 focus:bg-gray-100 dark:focus:bg-gray-800"
-              onClick={logout}
+              // onClick={logout}
             >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>

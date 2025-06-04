@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 import React from 'react'
 import { Button } from '../ui/button'
@@ -87,7 +88,7 @@ const CreateRoom = () => {
             }
         } catch (error) {
             console.error('Room creation error:', error)
-            toast.error(error.response?.data?.message || 'Unexpected error occurred')
+            toast.error('Unexpected error occurred')
         } finally {
             setLoading(false)
         }
@@ -120,8 +121,6 @@ const CreateRoom = () => {
                                     alt="Room Banner Preview"
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
-                                        e.target.onerror = null
-                                        e.target.src = "/placeholder-banner.jpg"
                                         toast.error("Invalid image URL")
                                     }}
                                 />

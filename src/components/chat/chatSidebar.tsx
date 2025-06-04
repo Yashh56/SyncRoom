@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { ArrowLeft } from 'lucide-react'
 import axios from 'axios'
-import { useRoomStore } from '@/store/useRoomStore'
+import { Member, useRoomStore } from '@/store/useRoomStore'
 import { localURL } from '@/lib/url'
 
 interface ChatSideBarProps {
@@ -10,19 +10,9 @@ interface ChatSideBarProps {
     onBack?: () => void // Optional callback for custom back behavior
 }
 
-interface Member {
-    id: string;
-    user: {
-        id: string;
-        name: string;
-        image: string | null;
-    };
-    role: string;
-}
-
 const ChatSideBar = ({ roomId, onBack }: ChatSideBarProps) => {
-    const members: Member[] = useRoomStore((state) => state.members);
-    
+    const members: Member[] = useRoomStore((state) => state.members)
+
     useEffect(() => {
         const fetchMembers = async () => {
             try {
