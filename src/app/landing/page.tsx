@@ -13,7 +13,7 @@ export default function SyncRoomLanding() {
     const [isVisible, setIsVisible] = useState(false);
     const [activeFeature, setActiveFeature] = useState(0);
     const router = useRouter();
-    const { isAuthenticated, isInitialized, checkAuthStatus } = useAuthStore();
+    const { isAuthenticated, isInitialized, checkAuthStatus, user } = useAuthStore();
 
     useEffect(() => {
         setIsVisible(true);
@@ -21,6 +21,7 @@ export default function SyncRoomLanding() {
             try {
                 const res = await axios.get(`${localURL}/welcome`);
                 console.log(res.data)
+                console.log(user)
             } catch (error) {
                 console.log(error)
             }
