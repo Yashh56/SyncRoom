@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import axios from 'axios';
+import { localURL } from '@/lib/url';
 
 export default function SyncRoomLanding() {
     const [isVisible, setIsVisible] = useState(false);
@@ -15,6 +17,15 @@ export default function SyncRoomLanding() {
 
     useEffect(() => {
         setIsVisible(true);
+        async function welcome() {
+            try {
+                const res = await axios.get(`${localURL}/welcome`);
+                console.log(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        welcome();
     }, []);
 
     useEffect(() => {
