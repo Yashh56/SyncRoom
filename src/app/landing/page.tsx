@@ -20,7 +20,9 @@ export default function SyncRoomLanding() {
         async function welcome() {
             try {
                 const res = await axios.get(`${localURL}/welcome`);
+                const res2 = await axios.get(`${localURL}/auth/status`, { withCredentials: true });
                 console.log(res.data)
+                console.log(res2.data);
                 console.log(user)
             } catch (error) {
                 console.log(error)
