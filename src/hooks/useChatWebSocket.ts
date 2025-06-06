@@ -1,4 +1,5 @@
 // src/hooks/useChatWebsocket.ts
+import { WSS_URL } from "@/lib/url";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMessageStore } from "@/store/useMessageStore";
 import { useEffect, useState } from "react";
@@ -9,9 +10,7 @@ export function useChatWebSocket(roomId: string, token: string) {
   console.log(token, roomId, user?.id);
   useEffect(() => {
     if (user?.id && roomId && token) {
-      const ws = new WebSocket(
-        `ws://localhost:5000/ws?token=${token}&roomId=${roomId}`
-      );
+      const ws = new WebSocket(`${WSS_URL}/ws?token=${token}&roomId=${roomId}`);
 
       ws.onopen = () => {
         console.log("WebSocket connection established");
