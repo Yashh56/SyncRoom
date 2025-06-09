@@ -61,14 +61,14 @@ const RoomInvitePage = () => {
       try {
         setIsLoading(true);
         const res = await axios.get(`${localURL}/room/invite/${inviteCode}`, { withCredentials: true });
-        console.log(res.data)
+        // console.log(res.data)
         const data = res.data.data;
 
         setRoomData(data);
         setIsLoading(false);
         document.title = `Room: ${data.name}`;
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         setError("Failed to load room information");
         setIsLoading(false);
       }
@@ -98,7 +98,7 @@ const RoomInvitePage = () => {
       }, 1500);
 
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setJoinStatus('error');
     } finally {
       setIsJoining(false);

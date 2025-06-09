@@ -11,12 +11,14 @@ import { localURL } from '@/lib/url'
 
 const JoinedRooms = () => {
   interface Room {
-    id: number
+    id: string
     name: string
     description: string
     banner: string
-    totalMembers: number
     onlineMembers: number
+    _count: {
+      members: number
+    }
   }
 
   const [joinedRooms, setJoinedRooms] = React.useState<Room[]>([])
@@ -76,14 +78,14 @@ const JoinedRooms = () => {
             <div className="relative bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/30 dark:border-gray-700/30 shadow-lg">
               {/* Animated background gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-purple-500/5 dark:from-violet-500/10 dark:to-purple-500/10 rounded-2xl animate-pulse"></div>
-              
+
               <div className="relative flex items-center gap-4">
                 {/* Avatar skeleton */}
                 <div className="relative">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 animate-pulse"></div>
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse"></div>
                 </div>
-                
+
                 {/* Content skeleton */}
                 <div className="flex flex-col gap-2 flex-1">
                   <div className="flex justify-between items-start">
@@ -105,7 +107,7 @@ const JoinedRooms = () => {
 
   if (joinedRooms.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         className="text-center py-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -125,8 +127,8 @@ const JoinedRooms = () => {
   return (
     <div className="space-y-3">
       {joinedRooms.map((room, index) => {
-        const onlineStatus = getOnlineStatus(room.onlineMembers, room.totalMembers)
-        
+        const onlineStatus = getOnlineStatus(room.onlineMembers, room._count.members)
+
         return (
           <motion.div
             key={room.id}
@@ -138,13 +140,13 @@ const JoinedRooms = () => {
           >
             <Link href={`/room/${room.id}`} className="block">
               <div className="relative bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/30 dark:border-gray-700/30 shadow-lg hover:shadow-xl hover:bg-white/60 dark:hover:bg-gray-800/60 transition-all duration-300 group-hover:border-violet-300/50 dark:group-hover:border-violet-600/50">
-                
+
                 {/* Hover gradient effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-purple-500/0 dark:from-violet-500/0 dark:via-violet-500/10 dark:to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                
+
                 {/* Floating accent */}
                 <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
-                
+
                 <div className="relative flex items-center gap-4">
                   {/* Enhanced Avatar */}
                   <div className="relative">
@@ -155,13 +157,13 @@ const JoinedRooms = () => {
                         {room.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     {/* Online indicator */}
                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg border border-gray-200/50 dark:border-gray-700/50">
                       <div className={`w-3 h-3 rounded-full ${room.onlineMembers > 0 ? 'bg-emerald-500' : 'bg-gray-400'} ${room.onlineMembers > 0 ? 'animate-pulse' : ''}`}></div>
                     </div>
                   </div>
-                  
+
                   {/* Enhanced Content */}
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-1">
@@ -176,26 +178,26 @@ const JoinedRooms = () => {
                           {room.onlineMembers}
                         </span>
                         <span className="text-xs text-gray-400 dark:text-gray-500">
-                          /{room.totalMembers}
+                          /{room._count.members}
                         </span>
                       </div>
                     </div>
-                    
+
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
                       {room.description || 'No description available'}
                     </p>
-                    
+
                     {/* Enhanced Stats */}
                     <div className="flex items-center gap-4 text-xs">
                       <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                         <Users className="w-3 h-3" />
-                        <span className="font-medium">{room.totalMembers} members</span>
+                        <span className="font-medium">{room._count.members} members</span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                         <MessageCircle className="w-3 h-3" />
                         <span className="font-medium">Active</span>
                       </div>
-                      {room.onlineMembers > room.totalMembers * 0.7 && (
+                      {room.onlineMembers > room._count.members * 0.7 && (
                         <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                           <Sparkles className="w-3 h-3" />
                           <span className="font-medium">Hot</span>
@@ -204,7 +206,7 @@ const JoinedRooms = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Bottom gradient line */}
                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>

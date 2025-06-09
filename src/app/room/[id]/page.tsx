@@ -35,6 +35,7 @@ interface RoomDetails {
   inviteCode: string
   banner?: string
   Chat: Chat[]
+  Materials?: []
 }
 
 interface ApiResponse {
@@ -71,6 +72,7 @@ const RoomPage = () => {
       })
 
       if (res.data.status === 'success' && res.data.data) {
+        // console.log(res.data.data)
         setRoomDetails(res.data.data)
         setRetryCount(0)
         document.title = `${res.data.data.name}`
@@ -145,7 +147,7 @@ const RoomPage = () => {
   }
 
   const handleBack = () => {
-    router.back()
+    router.replace('/')
   }
 
   useEffect(() => {
@@ -329,7 +331,7 @@ const RoomPage = () => {
 
         <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4 text-center">
           <BookOpen className="w-6 h-6 mx-auto mb-2 text-yellow-400" />
-          <p className="text-2xl font-bold text-white">0</p>
+          <p className="text-2xl font-bold text-white">{roomDetails.Materials?.length}</p>
           <p className="text-sm text-gray-400">Resources</p>
         </div>
       </div>

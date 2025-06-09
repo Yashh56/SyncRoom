@@ -30,7 +30,7 @@ const SuggestedRooms = () => {
                 setLoading(true);
                 setError(null);
                 const res = await axios.get(`${localURL}/room/public`, { withCredentials: true });
-                console.log(res.data.data);
+                // console.log(res.data.data);
                 setRooms(res.data.data);
             } catch (error) {
                 console.error("Failed to fetch rooms:", error);

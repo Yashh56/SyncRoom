@@ -105,7 +105,7 @@ const RoomSettingsPage = () => {
         withCredentials: true,
         timeout: 10000,
       })
-      console.log(res.data.data)
+      // console.log(res.data.data)
       if (res.data.status === 'success' && res.data.data) {
         const room = res.data.data
         setRoomDetails(room)
@@ -309,7 +309,7 @@ const RoomSettingsPage = () => {
         mode: mode,
         banner: 'https://i.pinimg.com/736x/d9/ab/45/d9ab4584e795b62f3717a989ef933e0e.jpg',
       }, { withCredentials: true })
-      console.log(res.data)
+      // console.log(res.data)
       if (res.data.status === 'success') {
         toast.success('Room updated successfully')
         getRoomDetails()
@@ -317,7 +317,7 @@ const RoomSettingsPage = () => {
         toast.error(res.data.message)
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 

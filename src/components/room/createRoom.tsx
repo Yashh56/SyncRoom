@@ -53,7 +53,7 @@ const CreateRoom = () => {
                 const uploadResult = await edgestore.publicFiles.upload({
                     file,
                     onProgressChange: (progress) => {
-                        console.log('Upload progress:', progress)
+                        // console.log('Upload progress:', progress)
                     },
                 })
                 uploadedBannerUrl = uploadResult.url

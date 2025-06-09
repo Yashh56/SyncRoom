@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export function useChatWebSocket(roomId: string, token: string) {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const user = useAuthStore((state) => state.user);
-  console.log(token, roomId, user?.id);
+  // console.log(token, roomId, user?.id);
   useEffect(() => {
     if (user?.id && roomId && token) {
       const ws = new WebSocket(`${WSS_URL}/ws?token=${token}&roomId=${roomId}`);
@@ -21,7 +21,7 @@ export function useChatWebSocket(roomId: string, token: string) {
 
       //   if (data.event === "message:received") {
       //     useMessageStore.getState().addMessage(data.message);
-      //     console.log("Message received:", data.message);
+      //     // console.log("Message received:", data.message);
       //   }
       // };
 
@@ -38,7 +38,7 @@ export function useChatWebSocket(roomId: string, token: string) {
             break;
 
           default:
-            console.log("Unknown event type:", data.event);
+            // console.log("Unknown event type:", data.event);
         }
       };
 
@@ -47,7 +47,7 @@ export function useChatWebSocket(roomId: string, token: string) {
       };
 
       ws.onclose = () => {
-        console.log("WebSocket connection closed");
+        // console.log("WebSocket connection closed");
       };
 
       setSocket(ws);

@@ -60,10 +60,10 @@ const MaterialsPage = () => {
                 const res = await axios.get(`${localURL}/materials/${roomId}`, {
                     withCredentials: true
                 });
-                console.log(res.data)
+                // console.log(res.data)
                 setMaterials(res.data.data)
             } catch (error) {
-                console.log(error)
+                // console.log(error)
             }
         }
 
@@ -72,10 +72,10 @@ const MaterialsPage = () => {
                 const res = await axios.get(`${localURL}/room/details/${roomId}`, {
                     withCredentials: true
                 });
-                console.log(res.data.data.members);
+                // console.log(res.data.data.members);
                 setMembers(res.data.data.members);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         }
 
@@ -95,7 +95,7 @@ const MaterialsPage = () => {
                 const uploadResult = await edgestore.publicFiles.upload({
                     file: fileToUpload,
                     onProgressChange: (progress) => {
-                        console.log('Upload progress:', progress);
+                        // console.log('Upload progress:', progress);
                         setUploadProgress(progress);
                     },
                 });
@@ -110,7 +110,7 @@ const MaterialsPage = () => {
                 withCredentials: true
             });
 
-            console.log(res.data);
+            // console.log(res.data);
 
             // Refresh materials list
             const updatedMaterials = await axios.get(`${localURL}/materials/${roomId}`, {
@@ -128,7 +128,7 @@ const MaterialsPage = () => {
             }, 500);
 
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             setIsUploading(false);
         }
     };
@@ -234,7 +234,7 @@ const MaterialsPage = () => {
     const deleteMaterial = async (id: string, attachmentUrl: string) => {
         try {
             const res = await axios.delete(`${localURL}/materials/${id}`, { withCredentials: true })
-            console.log(res.data)
+            // console.log(res.data)
             // Refresh materials list after deletion
             if (res.data.status === 'success') {
                 await edgestore.publicFiles.delete({
@@ -247,7 +247,7 @@ const MaterialsPage = () => {
                 setMaterials(updatedMaterials.data.data);
             }
         } catch (error) {
-            console.log(error)
+            // console.log(error)
         }
     }
 

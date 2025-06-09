@@ -89,7 +89,7 @@ const MembersPage = () => {
                 withCredentials: true,
                 timeout: 10000,
             })
-            console.log(res.data.data)
+            // console.log(res.data.data)
             if (res.data.status === 'success' && res.data.data) {
 
                 setRoomDetails(res.data.data)
@@ -104,7 +104,7 @@ const MembersPage = () => {
             setLoading(false)
         }
     }, [id, baseApiUrl])
-    console.log(roomDetails)
+    // console.log(roomDetails)
     // Check if current user can manage members
     const currentUserMembership = roomDetails?.members.find(m => m.userId === currentUser?.id)
     const canManageMembers = currentUserMembership?.role === 'ADMIN' || currentUserMembership?.role === 'MODERATOR'
